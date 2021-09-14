@@ -75,7 +75,7 @@ while iterations < max_iterations and not isSame:
         clusters[closest_centroid_index].append(element)  # grouping each point into a cluster
 
     same_centroids = 0  # variable to check if all clusters change
-    # Finding new centroid for each cluster
+    # Finding new centroid for each cluster, k-means
     for cluster_k in clusters:
         average_of_cluster = compute_cluster_mean(cluster_k)  # literal average, not necessarily an element in cluster
         new_centroid = cluster_k[compute_centroid(average_of_cluster, cluster_k)]  # find new centroid
@@ -88,10 +88,46 @@ while iterations < max_iterations and not isSame:
 
     if same_centroids == k:
         isSame = 1
+    # Plotting elements as clusters (stars) -- 11 different clusters supported
+    clr = ["blue", "red", "green", "purple", "orange", "black", "brown", "cyan", "white", "yellow", "magenta"]
+    color_indx = 0
+    for cluster in clusters:
+        x = []
+        y = []
+        for i in cluster:
+            x.append(i[0])
+            y.append(i[1])
+        plt.scatter(x, y, label="Cluster " + str(color_indx), color=clr[color_indx%11], marker="*",
+                    s=30)
+        color_indx += 1
+    # Plotting the Centroids (Large Stars)
+    color_indx = 0
+    for centroid in centroids:
+        x = []
+        y = []
+        x.append(centroid[0])
+        y.append(centroid[1])
+        plt.scatter(x, y, label="Centroid " + str(color_indx), color=clr[color_indx%11], marker="*",
+                    s=450)
+        color_indx += 1
+    plt.ylabel('y-axis')
+    plt.title("K-Means Clustering")
+    plt.legend()
 
+    plt.show()
+
+# calculating WCSS
+total_cluster_sum =0
+for cluster_k in range(len(clusters)):
+    WCSS = 0
+    for element in clusters[cluster_k]:
+        for dim in range(dimensions):
+            WCSS += abs(element[dim] - centroids[cluster_k][dim]) ** 2
+    total_cluster_sum += WCSS
+print("Average WCSS:", total_cluster_sum/k)
 print("Number of Iterations: ", iterations)
-# Plotting elements as clusters (stars)
-clr = ["blue", "red", "green", "purple", "orange", "black"]  # supports 6 k's...
+# Plotting elements as clusters (stars) -- 11 different clusters supported
+clr = ["blue", "red", "green", "purple", "orange", "black", "brown", "cyan","white","yellow","magenta"]
 color_indx = 0
 for cluster in clusters:
     x = []
@@ -99,7 +135,7 @@ for cluster in clusters:
     for i in cluster:
         x.append(i[0])
         y.append(i[1])
-    plt.scatter(x, y,label="Cluster k", color=clr[color_indx], marker="*",
+    plt.scatter(x, y,label="Cluster "+str(color_indx), color=clr[color_indx%11], marker="*",
                 s=30)
     color_indx += 1
 
@@ -111,7 +147,7 @@ for centroid in centroids:
     y = []
     x.append(centroid[0])
     y.append(centroid[1])
-    plt.scatter(x, y, label="Centroid k", color=clr[color_indx], marker="*",
+    plt.scatter(x, y, label="Centroid "+str(color_indx), color=clr[color_indx%11], marker="*",
                 s=450)
     color_indx += 1
 plt.ylabel('y-axis')
