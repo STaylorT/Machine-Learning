@@ -98,7 +98,7 @@ def tokenize(sentences):
 def load_bag_of_words():
     dataset = []
     all_sentences = []
-    with open('mary.txt') as file:
+    with open('synthetic_reviews.txt') as file:
         all_sentences = file.readlines()
         all_sentences = [line.rstrip() for line in all_sentences]
 
