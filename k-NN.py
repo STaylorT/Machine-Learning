@@ -1,8 +1,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # Implementation of k-NN algorithm for Machine Learning
-# Primary developer: Abu Bakar, University of Kentucky
 #
-# Using/enhancing/butchering code: Sean Taylor Thomas
+# Sean Taylor Thomas
 # 9/2021
 # stth223@uky.edu
 # ----------------------------------------------------------------------------------------------------------------------
@@ -22,8 +21,8 @@ def p_root(value, root):
 # calculate distance
 def calculate_distance(row1, row2, distance_func=2):
     row1, row2, = row1[:-1], row2[:-1]  # removing labels
-    # return float(p_root(sum(pow(abs(a - b), distance_func) for a, b in zip(row1, row2)), distance_func)) #euclidian dist
-    return sum(abs(row1-row2) for row1, row2 in zip(row1,row2)) # manhattan distance
+    return float(p_root(sum(pow(abs(a - b), distance_func) for a, b in zip(row1, row2)), distance_func))
+
 
 
 # Test distance function
@@ -274,7 +273,7 @@ else:
 
 # filename = 'iris.csv'
 # dataset = load_csv(filename)
-if (val == "no" or val == "n"):
+if val == "no" or val == "n":
     for i in range(len(dataset[0]) - 1):
         str_column_to_float(dataset, i)
 
@@ -282,9 +281,9 @@ if (val == "no" or val == "n"):
     str_column_to_int(dataset, len(dataset[0]) - 1)
 
 # evaluate algorithm
-n_folds = 5
-num_neighbors = 5
-distance_func = 2
+n_folds = 12
+num_neighbors = 12
+distance_func = 3
 scores = evaluate_algorithm(dataset, k_nearest_neighbors, n_folds, num_neighbors, distance_func)
 print('Scores: %s' % scores)
 print('Mean Accuracy: %.3f%%' % (sum(scores) / float(len(scores))))
