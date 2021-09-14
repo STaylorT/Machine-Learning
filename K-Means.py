@@ -1,8 +1,27 @@
+# ----------------------------------------------------------------------------------------------------------------------
+# Implementation of k-Means Machine learning algorithm, tested using synthetic data created in script
+#
+# Sean Taylor Thomas
+# 9/2021
+# stth223@uky.edu
+# ----------------------------------------------------------------------------------------------------------------------
+
 import math
 import random
 import sys
+import matplotlib.pyplot as plt
 
+random.seed(1)
+
+# Generating Random dataset, dataset
+dataset = []
 dimensions = 2
+num_elements = 1000
+for x in range(num_elements):
+    rand1 = random.randint(0, 250)
+    rand2 = random.randint(0, 250)
+    if not rand2 == rand1 * 2 + 45:  # none on this line.. hmm
+        dataset.append([rand1, rand2])
 
 
 def compute_centroid(element, centroids):
@@ -21,6 +40,7 @@ def compute_centroid(element, centroids):
 
 
 def compute_cluster_mean(cluster):
+    """computes literal average of given cluster"""
     mean_element = list(cluster[0])
     for dim in range(dimensions):
         for element in cluster:
@@ -31,35 +51,71 @@ def compute_cluster_mean(cluster):
     return mean_element  # return average
 
 
-dataset = [[1, 1], [1, 4], [3, 4], [2, 2], [2, 3], [2, 1], [-1, -2], [-1, -4], [-4, -1], [-2, -1], [-3, -2]]
-random.seed(1)
-
-# Choosing initial centroids at random
-k = 2
+max_iterations = 200
+# Choosing initial centroids from dataset at random
+k = 5
 centroids = []
-centroids = random.choices(dataset, k=2)
-print("Initial centroids: ", centroids)
+centroids = random.choices(dataset, k=5)
 
-# Creating array, named clusters, to hold and separate k clusters
-clusters = []
-iterator = 0
-for x in range(k):
-    clusters.append(list())  # List representing each of k clusters
-    clusters[x].append(centroids[x])  # First element of each of the k clusters
-    # Element 0 will be the cluster seed
-    iterator += 1
+iterations = 0  # num iterations of loop
+isSame = 0  # boolean testing if previous clusters are the same as current
+while iterations < max_iterations and not isSame:
+    iterations += 1
+    # Initializing List, named clusters, to hold and separate k clusters
+    clusters = []
+    iterator = 0
+    for x in range(k):
+        clusters.append(list())  # List representing each of k clusters
+        iterator += 1
+
+    # Calculate distance from each element in dataset to each cluster seed
+    # And choose which of k clusters is closest to this element
+    for element in dataset:
+        closest_centroid_index = compute_centroid(element, centroids)  # index of centroid closest to element
+        clusters[closest_centroid_index].append(element)  # grouping each point into a cluster
+
+    same_centroids = 0  # variable to check if all clusters change
+    # Finding new centroid for each cluster
+    for cluster_k in clusters:
+        average_of_cluster = compute_cluster_mean(cluster_k)  # literal average, not necessarily an element in cluster
+        new_centroid = cluster_k[compute_centroid(average_of_cluster, cluster_k)]  # find new centroid
+
+        # add one for each centroid that hasn't change;
+        if new_centroid == centroids[clusters.index(cluster_k)]:
+            same_centroids += 1
+
+        centroids[clusters.index(cluster_k)] = new_centroid
+
+    if same_centroids == k:
+        isSame = 1
+
+print("Number of Iterations: ", iterations)
+# Plotting elements as clusters (stars)
+clr = ["blue", "red", "green", "purple", "orange", "black"]  # supports 6 k's...
+color_indx = 0
+for cluster in clusters:
+    x = []
+    y = []
+    for i in cluster:
+        x.append(i[0])
+        y.append(i[1])
+    plt.scatter(x, y,label="Cluster k", color=clr[color_indx], marker="*",
+                s=30)
+    color_indx += 1
 
 
-# Calculate distance from each element in dataset to each cluster seed
-# And choose which of k clusters is closest to this element
-for point in dataset:
-    closest_centroid_index = compute_centroid(point, centroids)
-    clusters[closest_centroid_index].append(point)  # grouping each point into a cluster
+   # Plotting the Centroids (Large Stars)
+color_indx=0
+for centroid in centroids:
+    x = []
+    y = []
+    x.append(centroid[0])
+    y.append(centroid[1])
+    plt.scatter(x, y, label="Centroid k", color=clr[color_indx], marker="*",
+                s=450)
+    color_indx += 1
+plt.ylabel('y-axis')
+plt.title("K-Means Clustering")
+plt.legend()
 
-# Finding new centroid for each cluster
-for cluster_k in clusters:
-    average_of_cluster = compute_cluster_mean(cluster_k)  # literal average, not necessarily an element in cluster
-    new_centroid = cluster_k[compute_centroid(average_of_cluster, cluster_k)]  # find new centroid (closest element to avg)
-    print("\n Here is the cluster vector: ", clusters)
-    print ("\n New centroid: ", new_centroid)
-
+plt.show()
