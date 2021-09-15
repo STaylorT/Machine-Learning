@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------------------------------------------------
-# Implementation of k-Means Machine learning algorithm, tested using synthetic data created in script
+# Implementation of k-Means++ Machine learning algorithm, tested using synthetic data created in script
 #
 # Sean Taylor Thomas
 # 9/2021
@@ -76,80 +76,77 @@ def create_clusters(dataset, centroids):
     return clusters
 
 
-
-k = 5
+k = int(input("Pick a k (less than 30 is nice..(only have 11 distinct colors): "))
+max_iterations = 200
 clusters = []
 for x in range(k):
     clusters.append(list())  # List representing each of k clusters
-max_iterations = 200
-# Choosing initial centroids from dataset at random
+
+
 centroids = []
 centroid = []
 centroid = random.choice(dataset)
-print(centroid)
 centroids.append(centroid)
+clr = ["blue", "red", "green", "purple", "orange", "black", "brown", "cyan", "white", "yellow", "magenta"]
+color_indx = 0
+
 
 i = 1  # num iterations of loop
 isSame = 0  # boolean testing if previous clusters are the same as current
-
-new_centroid_index = find_furthest_point(dataset, centroid, centroids)
-new_centroid = dataset[new_centroid_index]
-centroids.append(new_centroid)
-centroid = new_centroid
-while i < k:
-
-    clusters = create_clusters(dataset, centroids)
+# initial cluster creation
+clusters = create_clusters(dataset, centroids)
+while i < k and i < max_iterations:
     # finding max distance from intra-level cluster element
     max_dist = 0
     new_centroid_index = 0
     for cluster in clusters:
         for element in cluster:
             dist = 0  # temp dist
-            for i in range(dimensions):
-                dist += (element[i] - centroids[clusters.index(cluster)][i]) ** 2
+            for index in range(dimensions):
+                dist += (element[index] - centroids[clusters.index(cluster)][index]) ** 2
             if dist > max_dist:  # new max distance
                 max_dist = dist
-                curr_cluster_index = clusters[clusters.index(cluster)]
-
-                new_centroid_index = dataset.index(clusters[clusters.index(cluster)].index(element))
-    print(new_centroid_index)
+                new_centroid_index = dataset.index(element)
+    centroids.append((dataset[new_centroid_index]))
     i += 1
-print(centroids)
-# # calculating WCSS
-# total_cluster_sum = 0
-# for cluster_k in range(len(clusters)):
-#     WCSS = 0
-#     for element in clusters[cluster_k]:
-#         for dim in range(dimensions):
-#             WCSS += abs(element[dim] - centroids[cluster_k][dim]) ** 2
-#     total_cluster_sum += SWCS
-# print("Average WCSS:", total_cluster_sum / k)
-# print("Number of Iterations: ", iterations)
-# # Plotting elements as clusters (stars) -- 11 different clusters supported
-# clr = ["blue", "red", "green", "purple", "orange", "black", "brown", "cyan", "white", "yellow", "magenta"]
-# color_indx = 0
-# for cluster in clusters:
-#     x = []
-#     y = []
-#     for i in cluster:
-#         x.append(i[0])
-#         y.append(i[1])
-#     plt.scatter(x, y, label="Cluster " + str(color_indx), color=clr[color_indx % 11], marker="*",
-#                 s=30)
-#     color_indx += 1
-#
-# # Plotting the Centroids (Large Stars)
-# color_indx = 0
-# for centroid in centroids:
-#     x = []
-#     y = []
-#     x.append(centroid[0])
-#     y.append(centroid[1])
-#     plt.scatter(x, y, label="Centroid " + str(color_indx), color=clr[color_indx % 11], marker="*",
-#                 s=450)
-#     color_indx += 1
-# plt.ylabel('y-axis')
-# plt.title("K-Means Clustering")
-# plt.legend()
-#
-# plt.show()
+    clusters = create_clusters(dataset, centroids)
+    # Plotting elements as clusters (stars) -- 11 different clusters supported
+
+    for cluster in clusters:
+        color_indx = clusters.index(cluster)
+        x = []
+        y = []
+        for elem in cluster:
+            x.append(elem[0])
+            y.append(elem[1])
+        plt.scatter(x, y, label="Cluster " + str(color_indx), color=clr[color_indx % 11], marker="*",
+                    s=30)
+        color_indx += 1
+
+    # Plotting the Centroids (Large Stars)
+    for centroid_it in centroids:
+        color_indx = centroids.index(centroid_it)
+        x = []
+        y = []
+        x.append(centroid_it[0])
+        y.append(centroid_it[1])
+        plt.scatter(x, y, label="Centroid " + str(color_indx), color=clr[color_indx % 11], marker="*",
+                    s=450)
+        color_indx += 1
+    plt.ylabel('y-axis')
+    plt.title("K-Means Clustering")
+    plt.legend()
+
+    plt.show()
+print("Final Centroids: ", centroids)
+
+# calculating WCSS
+total_cluster_sum = 0
+for cluster_k in range(len(clusters)):
+    WCSS = 0
+    for element in clusters[cluster_k]:
+        for dim in range(dimensions):
+            WCSS += abs(element[dim] - centroids[cluster_k][dim]) ** 2
+    total_cluster_sum += WCSS / len(clusters[cluster_k])
+print("Average WCSS:", total_cluster_sum / k)
+
